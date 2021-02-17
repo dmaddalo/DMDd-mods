@@ -1,4 +1,4 @@
-clear all; close all;
+clearvars; close all;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % CODE NUMBER 3 / MULTI VARIABLE
@@ -12,12 +12,21 @@ clear all; close all;
 % ION AXIAL VELOCITY = vi1
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Set as true only if you still have to figure out best tolerances values,
+% otherwise keep this flag zero all the time
+tolerances = false;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 acc = true;
 ca = 3;
 va = {'n','Te','phi','vi1'};                        % KEEP THIS ORDER HERE
-eps1 = 5e-3;
-eps11 = 5e-3;
-eps2 = 3e-2;
+if tolerances == false
+    eps1 = 5e-3;
+    eps11 = 5e-2;
+    eps2 = 3e-2;
+end
 d = 700;
 skip = 1;
 cutt = 0;
@@ -82,7 +91,7 @@ mds = 11;
 
 cmap = [0,0,0; jet];
 
-[k,Sfull,U,S,W] = POD_basic(V,eps1);
+[U,Sfull,W] = svd(V,'econ');
 
 if PLOTSVD == true
     for j = 1:mds
@@ -151,6 +160,11 @@ end
 % values of tolerance due to subjective error levels. Multivariable case
 % requires an energy cut-off of 1e-2, not below. Spectra are plot both in
 % logarithmic scale for both axes and symmetrically with respect to x axis.
+
+if tolerances == true
+    [eps1,eps11] = A_Tol(d,V);
+end
+
 [Vrecon,deltas,omegas,amplitudes,modes] = DMDd_SIADS(d,V,t,eps1,eps11,eps2);
 
 s_deltas = sign(deltas);
