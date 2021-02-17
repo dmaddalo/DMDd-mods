@@ -55,6 +55,7 @@ function  [Vreconst,deltas,omegas,amplitude,modes] =DMDd(d,V,Time,varepsilon1,va
 
 [U,Sigma,T]=svd(V,'econ');
 sigmas=diag(Sigma);
+Sigma = sparse(Sigma);
 n=length(sigmas);
 
 NormS=norm(sigmas,2);
@@ -83,7 +84,11 @@ end
 
 %% Dimension reduction
 [U1,Sigma1,T1]=svd(tildeT,'econ');
+
+clear tildeT V T
+
 sigmas1=diag(Sigma1);
+Sigma1 = sparse(Sigma1);
 
 Deltat=Time(2)-Time(1);
 n=length(sigmas1);
@@ -103,6 +108,8 @@ kk1
 
 U1=U1(:,1:kk1);
 hatT1=Sigma1(1:kk1,1:kk1)*T1(:,1:kk1)';
+
+clear T1
 
 %% Reduced modified snapshot matrix
 [~,K1]=size(hatT1);
