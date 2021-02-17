@@ -68,10 +68,11 @@ sigmas=diag(Sigma);
 Sigma = sparse(Sigma);
 n=length(sigmas);
 
-NormS=norm(sigmas,2);
+NormS=norm(sigmas,2); RMS1 = zeros(1,K);
 kk=0;
 for k=1:n
-    if norm(sigmas(k:n),2)/NormS>varepsilon1
+    RMS1(k) = norm(sigmas(k:n),2)/NormS;
+    if RMS1(k)>varepsilon1
         kk=kk+1;
     end
 end
@@ -103,7 +104,7 @@ Sigma1 = sparse(Sigma1);
 Deltat=Time(2)-Time(1);
 n=length(sigmas1);
 
-NormS=norm(sigmas1,2);
+NormS=norm(sigmas1,2); RRMSEE = zeros(1,n);
 kk1=0;
 for k=1:n
     RRMSEE(k)=norm(sigmas1(k:n),2)/NormS;
