@@ -26,6 +26,16 @@
  % SUCH DAMAGE.
  %
  % $FreeBSD$
+ 
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ % FIND OUT HOW MUCH DISK SPACE IS BEING USED, UNCOMMENT, HIGHLIGHT AND F9
+ % 
+%  variables = whos; howbig = zeros(size(variables,1),1);
+%  for i = 1:size(variables,1)
+%     howbig(i) = variables(i).bytes;
+%  end
+%  howbigall = sum(howbig);
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function  [Vreconst,deltas,omegas,amplitude,modes] =DMDd(d,V,Time,varepsilon1,varepsilon2,varepsilon)
 
