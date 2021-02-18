@@ -155,8 +155,15 @@ for k=1:K
     Bb(1+(k-1)*NN:k*NN,1)=hatT(:,k);
 end
 
+clear U1 tildeQ tildeT tildeMM tildeU1 tildeU2 tildeR tildeSigma hatT hatT1
+
 [Ur,Sigmar,Vr]=svd(Mm,'econ');
+
+clear Mm
+
 a=Vr*(Sigmar\(Ur'*Bb));
+
+clear Vr Sigmar Ur Bb
 
 u=zeros(NN,M);
 for m=1:M
