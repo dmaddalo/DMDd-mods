@@ -28,7 +28,7 @@
  % $FreeBSD$
  
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- % FIND OUT HOW MUCH DISK SPACE IS BEING USED, UNCOMMENT, HIGHLIGHT AND F9
+ % FIND OUT HOW MUCH DISK SPACE IS BEING USED
  % 
 %  variables = whos; howbig = zeros(size(variables,1),1);
 %  for i = 1:size(variables,1)
@@ -37,7 +37,7 @@
 %  howbigall = sum(howbig);
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function  [Vreconst,deltas,omegas,amplitude,modes] =DMDd(d,V,Time,varepsilon1,varepsilon2,varepsilon)
+function  [Vreconst,deltas,omegas,amplitude,modes] =DMDd_SIADS(d,V,Time,varepsilon1,varepsilon2,varepsilon)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%  DMD-d %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -116,7 +116,6 @@ end
 ('Spatial dimension reduction')
 kk1
 
-
 U1=U1(:,1:kk1);
 hatT1=Sigma1(1:kk1,1:kk1)*T1(:,1:kk1)';
 
@@ -149,19 +148,31 @@ end
 Mm=zeros(NN*K,M);
 Bb=zeros(NN*K,1);
 aa=eye(MMM);
+
+clear U1 tildeQ tildeT tildeU1 tildeU2 tildeR tildeSigma hatT1
+
 for k=1:K
     Mm(1+(k-1)*NN:k*NN,:)=Q*aa;
     aa=aa*tildeMM;
     Bb(1+(k-1)*NN:k*NN,1)=hatT(:,k);
 end
 
-clear U1 tildeQ tildeT tildeMM tildeU1 tildeU2 tildeR tildeSigma hatT hatT1
+clear tildeMM hatT
 
-[Ur,Sigmar,Vr]=svd(Mm,'econ');
+CMm = Mm'*Mm;
+Trick = Mm'*Bb;
 
-clear Mm
+clear Mm Bb
 
-a=Vr*(Sigmar\(Ur'*Bb));
+[Vr,Sigmar2,~] = svd(CMm);
+
+a = Vr*inv(Sigmar2)*Vr'*Trick;
+
+% [Ur,Sigmar,Vr]=svd(Mm,'econ');
+% 
+% clear Mm
+% 
+% a=Vr*(Sigmar\(Ur'*Bb));
 
 clear Vr Sigmar Ur Bb
 
