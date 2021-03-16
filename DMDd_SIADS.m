@@ -63,7 +63,7 @@ function  [Vreconst,deltas,omegas,amplitude,modes] =DMDd_SIADS(d,V,Time,varepsil
 
 %% STEP 1: SVD of the original data
 
-[U,Sigma,T]=svd(V,'econ');
+[U,Sigma,W]=svd(V,'econ');
 sigmas=diag(Sigma);
 Sigma = sparse(Sigma);
 n=length(sigmas);
@@ -84,22 +84,22 @@ U=U(:,1:kk);
 kk
 
 %% Create reduced snapshots matrix
-hatT=Sigma(1:kk,1:kk)*T(:,1:kk)';
-[N,~]=size(hatT);
+hatV=Sigma(1:kk,1:kk)*W(:,1:kk)';
+[N,~]=size(hatV);
 
 %% Create the modified snapshot matrix
-tildeT=zeros(d*N,K-d+1);
+tilV=zeros(d*N,K-d+1);
 for ppp=1:d
-    tildeT((ppp-1)*N+1:ppp*N,:)=hatT(:,ppp:ppp+K-d);
+    tilV((ppp-1)*N+1:ppp*N,:)=hatV(:,ppp:ppp+K-d);
 end
 
 %% Dimension reduction
-[U1,Sigma1,T1]=svd(tildeT,'econ');
+[tilU,tilSigma,tilW]=svd(tilV,'econ');
 
-clear tildeT V T
+clear tilV V W
 
-sigmas1=diag(Sigma1);
-Sigma1 = sparse(Sigma1);
+sigmas1=diag(tilSigma);
+tilSigma = sparse(tilSigma);
 
 Deltat=Time(2)-Time(1);
 n=length(sigmas1);
@@ -116,26 +116,25 @@ end
 ('Spatial dimension reduction')
 kk1
 
-U1=U1(:,1:kk1);
-hatT1=Sigma1(1:kk1,1:kk1)*T1(:,1:kk1)';
+tilU=tilU(:,1:kk1);
+hattilV=tilSigma(1:kk1,1:kk1)*tilW(:,1:kk1)';
 
-clear T1
+clear tilW
 
 %% Reduced modified snapshot matrix
-[~,K1]=size(hatT1);
-[tildeU1,tildeSigma,tildeU2]=svd(hatT1(:,1:K1-1),'econ');
+[hattilU,hattilSigma,hattilW]=svd(hattilV(:,1:end-1),'econ');
 
 %% Reduced modified Koopman matrix
-tildeR=hatT1(:,2:K1)*tildeU2*inv(tildeSigma)*tildeU1';
-[tildeQ,tildeMM]=eig(tildeR);
-eigenvalues=diag(tildeMM);
+tilS=hattilV(:,2:end)*hattilW*inv(hattilSigma)*hattilU';
+[tilQ,tilMM]=eig(tilS);
+eigenvalues=diag(tilMM);
 
 M=length(eigenvalues);
 qq=log(eigenvalues);
 deltas=real(qq)/Deltat;
 omegas=imag(qq)/Deltat;
 
-Q=U1*tildeQ;
+Q=tilU*tilQ;
 Q=Q((d-1)*N+1:d*N,:);
 [NN,MMM]=size(Q);
 
@@ -149,12 +148,12 @@ Mm=zeros(NN*K,M);
 Bb=zeros(NN*K,1);
 aa=eye(MMM);
 
-clear U1 tildeQ tildeT tildeU1 tildeU2 tildeR tildeSigma hatT1
+clear U1 tilQ tilW hattilU hattilW tildeR hattilSigma hattilV
 
 for k=1:K
     Mm(1+(k-1)*NN:k*NN,:)=Q*aa;
-    aa=aa*tildeMM;
-    Bb(1+(k-1)*NN:k*NN,1)=hatT(:,k);
+    aa=aa*tilMM;
+    Bb(1+(k-1)*NN:k*NN,1)=hatV(:,k);
 end
 
 clear tildeMM hatT
