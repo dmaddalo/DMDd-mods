@@ -144,36 +144,65 @@ for m=1:MMM
 end
 
 %% Calculate amplitudes
-Mm=zeros(NN*K,M);
-Bb=zeros(NN*K,1);
-aa=eye(MMM);
+% Mm=zeros(NN*K,M);
+% Bb=zeros(NN*K,1);
+% aa=eye(MMM);
+% 
+% clear U1 tilQ tilW hattilU hattilW tildeR hattilSigma hattilV
+% 
+% for k=1:K
+%     Mm(1+(k-1)*NN:k*NN,:)=Q*aa;
+%     aa=aa*tilMM;
+%     Bb(1+(k-1)*NN:k*NN,1)=hatV(:,k);
+% end
+% 
+% clear tildeMM hatT
+% 
+% CMm = Mm'*Mm;
+% Trick = Mm'*Bb;
+% 
+% clear Mm Bb
+% 
+% [Vr,Sigmar2,~] = svd(CMm);
+% 
+% a = Vr*inv(Sigmar2)*Vr'*Trick;
+% 
+% % [Ur,Sigmar,Vr]=svd(Mm,'econ');
+% % 
+% % clear Mm
+% % 
+% % a=Vr*(Sigmar\(Ur'*Bb));
+% 
+% clear Vr Sigmar Ur Bb
 
-clear U1 tilQ tilW hattilU hattilW tildeR hattilSigma hattilV
+%% Calculate amplitudes (lighter)
 
-for k=1:K
-    Mm(1+(k-1)*NN:k*NN,:)=Q*aa;
-    aa=aa*tilMM;
-    Bb(1+(k-1)*NN:k*NN,1)=hatV(:,k);
+Phi = tilU*hattilV; Phi = Phi((d-1)*N+1:d*N,2:end);
+[~,SigmaPhi,WPhi] = svd(Phi,'econ');
+
+r = rank(tilS); KK = size(hattilW,1);
+
+Vand = zeros(r,KK);
+zdmd = eigenvalues;
+
+for i = 1:KK
+	Vand(:,i) = zdmd.^(i-1);
 end
 
-clear tildeMM hatT
+L = Q;
+R = Vand;
+G = SigmaPhi*WPhi';
 
-CMm = Mm'*Mm;
-Trick = Mm'*Bb;
+P = (L'*L).*conj(R*R');
+q = conj(diag(R*G'*L));
+% s = trace(G'*G);
 
-clear Mm Bb
+Pl = chol(P,'lower');
 
-[Vr,Sigmar2,~] = svd(CMm);
+a = (Pl')\(Pl\q);
+% a = P\q;
 
-a = Vr*inv(Sigmar2)*Vr'*Trick;
-
-% [Ur,Sigmar,Vr]=svd(Mm,'econ');
-% 
-% clear Mm
-% 
-% a=Vr*(Sigmar\(Ur'*Bb));
-
-clear Vr Sigmar Ur Bb
+%%
 
 u=zeros(NN,M);
 for m=1:M
