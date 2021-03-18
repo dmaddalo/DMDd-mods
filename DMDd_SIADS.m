@@ -96,7 +96,7 @@ end
 %% Dimension reduction
 [tilU,tilSigma,tilW]=svd(tilV,'econ');
 
-clear tilV V W
+clear tilV
 
 sigmas1=diag(tilSigma);
 tilSigma = sparse(tilSigma);
@@ -177,21 +177,23 @@ end
 
 %% Calculate amplitudes (lighter)
 
-Phi = tilU*hattilV; Phi = Phi((d-1)*N+1:d*N,2:end);
-[~,SigmaPhi,WPhi] = svd(Phi,'econ');
+% Phi = tilU*hattilV; Phi = U*Phi((d-1)*N+1:d*N,2:end);
+% [~,SigmaPhi,WPhi] = svd(Phi,'econ');
 
-r = rank(tilS); KK = size(hattilW,1);
+r = rank(tilS);
+% KK = size(hattilW,1);
 
-Vand = zeros(r,KK);
+Vand = zeros(r,K);
 zdmd = eigenvalues;
 
-for i = 1:KK
+for i = 1:K
 	Vand(:,i) = zdmd.^(i-1);
 end
 
 L = Q;
 R = Vand;
-G = SigmaPhi*WPhi';
+G = hatV;
+% G = Sigma*W';
 
 P = (L'*L).*conj(R*R');
 q = conj(diag(R*G'*L));
