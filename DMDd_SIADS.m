@@ -68,7 +68,7 @@ sigmas=diag(Sigma);
 Sigma = sparse(Sigma);
 n=length(sigmas);
 
-NormS=norm(sigmas,2); RMS1 = zeros(1,K);
+NormS=norm(sigmas,2); RMS1 = zeros(1,n);
 kk=0;
 for k=1:n
     RMS1(k) = norm(sigmas(k:n),2)/NormS;
@@ -241,8 +241,8 @@ u=u(:,1:kk3);
 deltas=deltas(1:kk3);
 omegas=omegas(1:kk3);
 amplitude=amplitude(1:kk3);
-('Mode number, delta, omega, amplitude')
-DeltasOmegAmpl=[(1:kk3)',deltas',omegas',amplitude']
+% ('Mode number, delta, omega, amplitude')
+% DeltasOmegAmpl=[(1:kk3)',deltas',omegas',amplitude']
 
 %% Reconstruction of the original snapshot matrix
 hatTreconst=zeros(N,K);
@@ -250,7 +250,7 @@ for k=1:K
     hatTreconst(:,k)= ContReconst_SIADS(Time(k),Time(1),u,deltas,omegas);
 end
 
-Vreconst=U*hatTreconst;
+Vreconst = real(U*hatTreconst);
 
 %% Calculation of DMD modes
 modes=zeros(J,kk3);
